@@ -5,7 +5,7 @@ Pipeline Scheduling Optimization
 Liz Codd, Rachel Dao, Evan Haines, Gino Romanello
 7/23/22
 """
-from math import inf
+from math import inf, log2, sqrt
 
 
 def main():
@@ -158,7 +158,7 @@ class Job:
         """
         self.sample = sample
         self.task = task
-        self.duration = sample.file_size * task.time_factor // task.cpus
+        self.duration = sample.file_size * task.time_factor // task.cpus ** (3/4)
         self.memory = sample.file_size * task.space_factor
         self.cpus = task.cpus
         self.is_running = False
