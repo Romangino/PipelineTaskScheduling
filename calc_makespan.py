@@ -57,9 +57,6 @@ def calc_makespan(file_sizes, max_memory, max_cpus, tasks):
     :return: the makespan of the pipeline in the same units given in the tasks;
     int
     """
-    print(f"Calculating makespan for files with sizes: {file_sizes} on a machine with cumulative resource limits \
-of {max_memory} units of memory and {max_cpus} CPUs running the following pipeline tasks: {tasks}")
-
     num_steps = len(tasks)
     num_samples = len(file_sizes)
     samples = [Sample(i, file_sizes[i]) for i in range(num_samples)]
