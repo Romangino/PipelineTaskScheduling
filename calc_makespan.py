@@ -29,8 +29,6 @@ def main():
                                max_cpus=32,
                                tasks=[task_a, task_b])
 
-    # TODO: need more tests / code review (this was a first pass and probably has bugs)
-
     # More realistic example (but a little too big to work out by hand)
     bbduk = PipelineTask(name="BBDuk", step=0, time_factor=10, space_factor=1, cpus=8)
     fastqc = PipelineTask(name="FastQC", step=1, time_factor=5, space_factor=1, cpus=4)
@@ -121,7 +119,8 @@ class PipelineTask:
     A class to contain information and methods for a pipeline task
     """
 
-    def __init__(self, name, step, time_factor, space_factor, cpus):
+    def __init__(self, name, step, time_factor, space_factor, cpus,
+                 parallel_func=lambda size, time, cpus: size * time // cpus):
         """
         Construct a new instance of class PipelineTask.
 
@@ -139,6 +138,7 @@ class PipelineTask:
         self.time_factor = time_factor
         self.space_factor = space_factor
         self.cpus = cpus
+        self.parallel_func = parallel_func
 
     def __repr__(self):
         return f"Task #{self.step}: {self.name}"
@@ -158,7 +158,8 @@ class Job:
         """
         self.sample = sample
         self.task = task
-        self.duration = sample.file_size * task.time_factor // task.cpus ** (3/4)
+        # self.duration = sample.file_size * task.time_factor // task.cpus ** (3/4)
+        self.duration = task.parallel_func(sample.file_size, task.time_factor, task.cpus)
         self.memory = sample.file_size * task.space_factor
         self.cpus = task.cpus
         self.is_running = False

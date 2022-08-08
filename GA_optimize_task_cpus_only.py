@@ -8,9 +8,10 @@ from time_brute import brute_force_cpus
 
 def main():
     """ Run examples """
-    task_a = PipelineTask(name="A", step=0, time_factor=7, space_factor=3, cpus=8)
-    task_b = PipelineTask(name="B", step=1, time_factor=10, space_factor=1, cpus=12)
-    task_c = PipelineTask(name="C", step=2, time_factor=3, space_factor=2, cpus=4)
+    parallel_func = lambda size, time, cpus: size * time // cpus ** (3/4)  # diminishing CPU returns
+    task_a = PipelineTask(name="A", step=0, time_factor=7, space_factor=3, cpus=8, parallel_func=parallel_func)
+    task_b = PipelineTask(name="B", step=1, time_factor=10, space_factor=1, cpus=12, parallel_func=parallel_func)
+    task_c = PipelineTask(name="C", step=2, time_factor=3, space_factor=2, cpus=4, parallel_func=parallel_func)
     tasks = [task_a, task_b, task_c]
 
     best_makespan, best_cpu_assn = GA_cpus(file_sizes=[26, 42, 31, 19, 55, 11, 61], max_memory=200, max_cpus=64,
