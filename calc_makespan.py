@@ -192,7 +192,7 @@ def calc_makespan(file_sizes, max_memory, max_cpus, tasks):
     # Sorting task by step number beforehand
     tasks.sort(key=lambda task: task.step)
 
-    # Return -1 when steps have matching values
+    # Return -1 if any step is invalid.
     for i in range(len(tasks)):
         if tasks[i].step != i:
             return -1
