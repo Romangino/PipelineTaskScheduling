@@ -8,174 +8,13 @@ Liz Codd, Rachel Dao, Evan Haines, Gino Romanello
 from math import inf, log2, sqrt
 
 
-def main():
-    """ Run examples """
-    # Tests
-    task_a = PipelineTask(name="A", step=0, time_factor=4, space_factor=1, cpus=8)
-    task_b = PipelineTask(name="B", step=1, time_factor=6, space_factor=1, cpus=12)
-
-    assert -1 == calc_makespan(file_sizes=[20, 10, 10],
-                               max_memory=40,
-                               max_cpus=10,  # not enough CPUs for task B
-                               tasks=[task_a, task_b])
-
-    assert 30 == calc_makespan(file_sizes=[20, 10, 10],
-                               max_memory=32,
-                               max_cpus=20,
-                               tasks=[task_a, task_b])
-
-    assert 20 == calc_makespan(file_sizes=[20, 10, 10],
-                               max_memory=40,
-                               max_cpus=32,
-                               tasks=[task_a, task_b])
-
-    """
-    Tests for Gantt Chart
-    """
-
-    # Test 1
-    task_a = PipelineTask(name="A", step=0, time_factor=4, space_factor=1,
-                          cpus=8)
-    task_b = PipelineTask(name="B", step=1, time_factor=6, space_factor=1,
-                          cpus=12)
-
-    assert 30 == calc_makespan(file_sizes=[20, 10, 10],
-                               max_memory=32,
-                               max_cpus=20,
-                               tasks=[task_a, task_b])
-
-    # Test 2
-    task_a = PipelineTask(name="A", step=0, time_factor=2, space_factor=1,
-                          cpus=4)
-    task_b = PipelineTask(name="B", step=1, time_factor=5, space_factor=1,
-                          cpus=6)
-
-    assert 33 == calc_makespan(file_sizes=[25, 15, 10, 5],
-                               max_memory=64,
-                               max_cpus=16,
-                               tasks=[task_a, task_b])
-
-    # Test 3
-    task_a = PipelineTask(name="A", step=0, time_factor=6, space_factor=1,
-                          cpus=4)
-    task_b = PipelineTask(name="B", step=1, time_factor=4, space_factor=2,
-                          cpus=6)
-    task_c = PipelineTask(name="C", step=2, time_factor=8, space_factor=1,
-                          cpus=8)
-
-    assert 27 == calc_makespan(file_sizes=[2, 4, 6, 8],
-                               max_memory=32,
-                               max_cpus=16,
-                               tasks=[task_a, task_b, task_c])
-
-    """
-    CPU overload
-    Return -1 since not enough CPUs for program
-    """
-    task_a = PipelineTask(name="Task A", step=0, time_factor=2,
-                          space_factor=1, cpus=33)
-    assert -1 == calc_makespan([10, 10, 20],
-                               max_memory=32,
-                               max_cpus=32,
-                               tasks=[task_a])
-
-    """
-    Memory overload
-    Return -1 since not enough memory for program
-    """
-    task_a = PipelineTask(name="Task A", step=0, time_factor=2,
-                          space_factor=2, cpus=33)
-    assert -1 == calc_makespan([10, 20],
-                               max_memory=9,
-                               max_cpus=32,
-                               tasks=[task_a])
-
-    """
-    Max CPU for both task.
-    Returns 0. Is this the correct makespan need to make gantt chart
-    """
-    task_a = PipelineTask(name="Task A", step=0, time_factor=1,
-                          space_factor=1, cpus=32)
-    task_b = PipelineTask(name="Task B", step=1, time_factor=1,
-                          space_factor=1, cpus=32)
-    a = calc_makespan([10, 10, 20],
-                      max_memory=32,
-                      max_cpus=32,
-                      tasks=[task_a, task_b])
-    print("Max CPU:", a)
-
-    """
-    Test incorrect task sequence input
-    Seems to change makespan the order in which tasks are arranged in list.
-    
-    -   Fixed by sorting tasks by step before hand.
-    """
-    task_a = PipelineTask(name="Task A", step=0, time_factor=2,
-                          space_factor=1, cpus=2)
-    task_b = PipelineTask(name="Task B", step=1, time_factor=2,
-                          space_factor=1, cpus=2)
-    taskAtoB = calc_makespan([10, 10, 20],
-                             max_memory=32,
-                             max_cpus=32,
-                             tasks=[task_a, task_b])
-    taskBtoA = calc_makespan([10, 10, 20],
-                             max_memory=32,
-                             max_cpus=32,
-                             tasks=[task_b, task_a])
-    assert taskAtoB == taskBtoA
-
-    """
-     Skipping a step
-    
-    Stuck in loop, program does not finish
-    
-    - Fixed. Returns -1 when step order is missing a step.
-    """
-    task_a = PipelineTask(name="Task A", step=0, time_factor=2,
-                          space_factor=1, cpus=2)
-    task_c = PipelineTask(name="Task C", step=2, time_factor=2,
-                          space_factor=1, cpus=2)
-    assert -1 == calc_makespan([10, 10, 20],
-                               max_memory=32,
-                               max_cpus=32,
-                               tasks=[task_a, task_c])
-
-    """
-    Multiple steps with the same value
-    
-    Stuck in loop
-    
-    - Fixed. Return -1 when steps have matching values
-    """
-    task_a = PipelineTask(name="Task A", step=0, time_factor=2,
-                          space_factor=1, cpus=2)
-    task_b = PipelineTask(name="Task B", step=0, time_factor=2,
-                          space_factor=1, cpus=2)
-    task_c = PipelineTask(name="Task C", step=2, time_factor=2,
-                          space_factor=1, cpus=2)
-
-    assert -1 == calc_makespan([10, 10, 20],
-                               max_memory=32,
-                               max_cpus=32,
-                               tasks=[task_a, task_b, task_c])
-
-    # More realistic example (but a little too big to work out by hand)
-    bbduk = PipelineTask(name="BBDuk", step=0, time_factor=10, space_factor=1, cpus=8)
-    fastqc = PipelineTask(name="FastQC", step=1, time_factor=5, space_factor=1, cpus=4)
-    bwa = PipelineTask(name="BWA", step=2, time_factor=50, space_factor=2, cpus=16)
-    umi_tools = PipelineTask(name="UMI-tools", step=3, time_factor=60, space_factor=10, cpus=1)
-    print(calc_makespan(file_sizes=[3, 4, 8, 10, 5, 2, 1, 1, 3, 10],
-                        max_memory=200,
-                        max_cpus=60,
-                        tasks=[bbduk, fastqc, bwa, umi_tools]))
-
-
 def calc_makespan(file_sizes, max_memory, max_cpus, tasks):
     """
     Calculates the duration of each task for each file, then uses this
     information to calculate the total makespan of the pipeline assuming the
     files are processed in the given order, tasks must be completed in the
-    given order, and the next task starts as soon as enough resources become available.
+    given order, and the next task starts as soon as enough resources become
+    available.
 
     :param file_sizes: size of the files rounded to the nearest unit; int
     :param max_memory: the memory limits of the machine; int
@@ -197,7 +36,8 @@ def calc_makespan(file_sizes, max_memory, max_cpus, tasks):
         if tasks[i].step != i:
             return -1
 
-    # All jobs to be scheduled, e.g. row i column j contains ith task for the jth sample
+    # All jobs to be scheduled, e.g. row i column j contains ith task for
+    # the jth sample
     all_jobs = [[Job(sample, task) for sample in samples] for task in tasks]
     num_remaining_jobs = num_steps * num_samples
 
@@ -217,10 +57,12 @@ def calc_makespan(file_sizes, max_memory, max_cpus, tasks):
 
     # Keep the clock running until all jobs finish
     while num_remaining_jobs > 0:
-        next_t = inf  # update this to track when next running job ends (so we can jump to that time point)
+        # update this to track when next running job ends (so we can jump to
+        # that time point)
+        next_t = inf
 
-        # Check which running jobs have finished, give back their resources, mark the step as completed, and
-        # update next time point
+        # Check which running jobs have finished, give back their resources,
+        # mark the step as completed, and update next time point
         for job in schedule:
             if job.end_time == t:
                 job.is_running = False
@@ -231,7 +73,8 @@ def calc_makespan(file_sizes, max_memory, max_cpus, tasks):
             elif job.end_time > t and job.is_running:
                 next_t = min(next_t, job.end_time)
 
-        # Go through jobs and schedule next runnable job, decreasing resources and updating next_t and makespan
+        # Go through jobs and schedule next runnable job, decreasing
+        # resources and updating next_t and makespan
         for step in all_jobs:
             for job in step:
                 if not job.is_running and job.sample.steps_completed == job.task.step and \
@@ -296,8 +139,10 @@ class Job:
         """
         self.sample = sample
         self.task = task
-        # self.duration = sample.file_size * task.time_factor // task.cpus ** (3/4)
-        self.duration = task.parallel_func(sample.file_size, task.time_factor, task.cpus)
+        # self.duration = sample.file_size * task.time_factor // task.cpus
+        # ** (3/4)
+        self.duration = task.parallel_func(sample.file_size, task.time_factor,
+                                           task.cpus)
         self.memory = sample.file_size * task.space_factor
         self.cpus = task.cpus
         self.is_running = False
@@ -310,7 +155,8 @@ class Job:
 
 class Sample:
     """
-    A class to contain information about a sample to be run through the pipeline.
+    A class to contain information about a sample to be run through the
+    pipeline.
     """
 
     def __init__(self, sample_id, file_size):
@@ -326,7 +172,3 @@ class Sample:
 
     def __repr__(self):
         return f"Sample {self.sample_id}, size {self.file_size}"
-
-
-if __name__ == "__main__":
-    main()
