@@ -26,7 +26,22 @@ def swap(sched, i, j):
   return out
 
 
-def simulated_annealing(jobs, max_memory, max_cpus, tasks,  T=500, r=0.99, L=5, T_min = 0.2):
+def create_plot(jobs, max_memory, max_cpus, tasks, T=500, r=0.99, L=5, T_min = 0.2):
+
+  temp_array = []
+  makespan_array = []
+  simulated_annealing(jobs, max_memory, max_cpus, tasks, temp_array, makespan_array, T, r, L, T_min)
+  plt.plot(temp_array, makespan_array)
+  ax = plt.gca()
+  ax.invert_xaxis()
+  plt.ylabel("Makespan")
+  plt.xlabel("Temperature")
+  plt.title("Temperature vs Makespan")
+  plt.show()
+
+
+
+def simulated_annealing(jobs, max_memory, max_cpus, tasks, temp_arr=[], makespan_arr=[], T=500, r=0.99, L=5, T_min = 0.2):
   '''
   Simulated Annealing for heuristically solving the job shop 
   scheduling problem.
@@ -49,6 +64,9 @@ def simulated_annealing(jobs, max_memory, max_cpus, tasks,  T=500, r=0.99, L=5, 
   #abort if calc_makespan returns -1
   if make_span_s == -1:
     raise Exception("Trying to process inviable list of jobs")
+
+  temp_arr.append(T)
+  makespan_arr.append(make_span_s)
 
   while not frozen:
 
@@ -90,6 +108,8 @@ def simulated_annealing(jobs, max_memory, max_cpus, tasks,  T=500, r=0.99, L=5, 
       frozen = True
 
     T = r * T   #reduce temerpature using constant r
+    temp_arr.append(T)
+    makespan_arr.append(make_span_s)
 
   return s
 
@@ -113,9 +133,11 @@ if __name__ == "__main__":
 
   jobs2 = [8, 9, 10, 12, 7, 15, 22, 19, 11, 37, 45, 44, 2, 11, 5, 6, 8, 27, 1, 19]
   out2 = simulated_annealing(jobs2, 64, 16, [task_a, task_b])
-  #print(out2)
-  #print(ms.calc_makespan(jobs2, 64, 16, [task_a, task_b]))
-  #print(ms.calc_makespan(simulated_annealing(jobs2, 64, 16, [task_a, task_b]), 64, 16, [task_a, task_b]))
+  print(out2)
+  print(ms.calc_makespan(jobs2, 64, 16, [task_a, task_b]))
+  print(ms.calc_makespan(simulated_annealing(jobs2, 64, 16, [task_a, task_b]), 64, 16, [task_a, task_b]))
+
+  #create_plot(jobs2, 64, 16, [task_a, task_b])
 
   jobs3 = [25, 15, 10, 5]
   #print(ms.calc_makespan(jobs3, 64, 16, [task_a, task_b]))
