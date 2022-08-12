@@ -1,5 +1,4 @@
 import math
-from scipy import constants
 import calc_makespan as ms
 import random as ran
 from matplotlib import pyplot as plt
@@ -27,7 +26,7 @@ def swap(sched, i, j):
   return out
 
 
-def simmulated_annealing(jobs, max_memory, max_cpus, tasks,  T=500, r=0.99, L=5):
+def simmulated_annealing(jobs, max_memory, max_cpus, tasks,  T=500, r=0.99, L=5, T_min = 1):
   '''
   Simulated Annealing for heuristically solving the job shop 
   scheduling problem.
@@ -38,6 +37,7 @@ def simmulated_annealing(jobs, max_memory, max_cpus, tasks,  T=500, r=0.99, L=5)
   r - temperature decrease constant (aka how fast the temperature 
     should decrease between iterations)
   L - number of positions swapped in each iteration
+  T_min - the temperature at which a satisfactory ordering has been found
 
   returns - a heuristically-optimized ordering of jobs as a list
   '''
@@ -68,17 +68,21 @@ def simmulated_annealing(jobs, max_memory, max_cpus, tasks,  T=500, r=0.99, L=5)
       #calculate and store change in makespan
       del_energy_state = make_span_s - make_span_s_prime
 
-      if del_energy_state < 0:  # if s' makespan < s makespan, adopt s' as the 
+      if del_energy_state > 0:  # if s' makespan < s makespan, adopt s' as the 
         s = s_prime             #current minimum value
         make_span_s = make_span_s_prime
-      elif del_energy_state > 0:
-        p = min(1, math.exp(-del_energy_state / constants.k * T))
-        if ran.random >= p:     #if s' makespan > s makespan, adopt s' as the
+      elif del_energy_state < 0:
+        p = math.exp(-del_energy_state / T)
+        random = ran.uniform(0, 1)
+        if random > p:     #if s' makespan > s makespan, adopt s' as the
           s = s_prime           #current minimum makespan upon a certain probablility
           make_span_s = make_span_s_prime #this prevents us from getting stuck in local minima
       
       is_not_frozen += del_energy_state
       count += 1
+    
+    if T <= T_min:
+      frozen = True
 
     # check if any changes to min makespan occur in the iteration.
     #if none occur, we have found a makespan that is GOOD ENOUGH!
@@ -93,8 +97,44 @@ def simmulated_annealing(jobs, max_memory, max_cpus, tasks,  T=500, r=0.99, L=5)
 
 if __name__ == "__main__":
 
-  arr1 = [1, 2, 3]
-  arr2 = arr1.copy()
-  arr2[1] = 100
+  ### TESTING TESTING TESTING TESTING TESTING ###
 
-  print(arr1, arr2)
+  task_a = ms.PipelineTask(name="A", step=0, time_factor=4,
+                          space_factor=1,
+                          cpus=8)
+  task_b = ms.PipelineTask(name="B", step=1, time_factor=6,
+                        space_factor=1,
+                        cpus=12)
+
+  jobs1 = [25, 15, 10, 5, 33, 8, 22, 9, 18, 18, 28, 42, 37]
+  #print(ms.calc_makespan(jobs1, 64, 16, [task_a, task_b]))
+  #print(ms.calc_makespan(simmulated_annealing(jobs1, 64, 16, [task_a, task_b]), 64, 16, [task_a, task_b]))
+
+
+  jobs2 = [8, 9, 10, 12, 7, 15, 22, 19, 11, 37, 45, 44, 2, 11, 5, 6, 8, 27, 1, 19]
+  out2 = simmulated_annealing(jobs2, 64, 16, [task_a, task_b])
+  #print(out2)
+  #print(ms.calc_makespan(jobs2, 64, 16, [task_a, task_b]))
+  #print(ms.calc_makespan(simmulated_annealing(jobs2, 64, 16, [task_a, task_b]), 64, 16, [task_a, task_b]))
+
+  jobs3 = [25, 15, 10, 5]
+  #print(ms.calc_makespan(jobs3, 64, 16, [task_a, task_b]))
+  out3 = simmulated_annealing(jobs3, 64, 16, [task_a, task_b])
+  #print(out3)
+  #print(ms.calc_makespan(out3, 64, 16, [task_a, task_b]))
+
+
+  task_a = ms.PipelineTask(name="A", step=0, time_factor=6,
+                          space_factor=1,
+                          cpus=4)
+  task_b = ms.PipelineTask(name="B", step=1, time_factor=4,
+                        space_factor=2,
+                        cpus=6)
+  task_c = ms.PipelineTask(name="C", step=2, time_factor=8,
+                        space_factor=1,
+                        cpus=8)
+
+  jobs4 = [5, 8, 12, 11, 4, 11, 15, 14, 12, 7, 9, 2, 3, 3, 5, 8, 10]
+  out4 = simmulated_annealing(jobs4, 32, 16, [task_a, task_b, task_c])
+  print(ms.calc_makespan(jobs4, 32, 16, [task_a, task_b, task_c]))
+  print(ms.calc_makespan(out4, 32, 16, [task_a, task_b, task_c]))
