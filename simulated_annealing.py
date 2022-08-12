@@ -26,7 +26,7 @@ def swap(sched, i, j):
   return out
 
 
-def simulated_annealing(jobs, max_memory, max_cpus, tasks,  T=500, r=0.99, L=5, T_min = 1):
+def simulated_annealing(jobs, max_memory, max_cpus, tasks,  T=500, r=0.99, L=5, T_min = 0.2):
   '''
   Simulated Annealing for heuristically solving the job shop 
   scheduling problem.
@@ -108,14 +108,14 @@ if __name__ == "__main__":
 
   jobs1 = [25, 15, 10, 5, 33, 8, 22, 9, 18, 18, 28, 42, 37]
   #print(ms.calc_makespan(jobs1, 64, 16, [task_a, task_b]))
-  #print(ms.calc_makespan(simmulated_annealing(jobs1, 64, 16, [task_a, task_b]), 64, 16, [task_a, task_b]))
+  #print(ms.calc_makespan(simulated_annealing(jobs1, 64, 16, [task_a, task_b]), 64, 16, [task_a, task_b]))
 
 
   jobs2 = [8, 9, 10, 12, 7, 15, 22, 19, 11, 37, 45, 44, 2, 11, 5, 6, 8, 27, 1, 19]
   out2 = simulated_annealing(jobs2, 64, 16, [task_a, task_b])
   #print(out2)
-  #print(ms.calc_makespan(jobs2, 64, 16, [task_a, task_b]))
-  #print(ms.calc_makespan(simmulated_annealing(jobs2, 64, 16, [task_a, task_b]), 64, 16, [task_a, task_b]))
+  print(ms.calc_makespan(jobs2, 64, 16, [task_a, task_b]))
+  print(ms.calc_makespan(simulated_annealing(jobs2, 64, 16, [task_a, task_b]), 64, 16, [task_a, task_b]))
 
   jobs3 = [25, 15, 10, 5]
   #print(ms.calc_makespan(jobs3, 64, 16, [task_a, task_b]))
@@ -136,5 +136,5 @@ if __name__ == "__main__":
 
   jobs4 = [5, 8, 12, 11, 4, 11, 15, 14, 12, 7, 9, 2, 3, 3, 5, 8, 10]
   out4 = simulated_annealing(jobs4, 32, 16, [task_a, task_b, task_c])
-  print(ms.calc_makespan(jobs4, 32, 16, [task_a, task_b, task_c]))
-  print(ms.calc_makespan(out4, 32, 16, [task_a, task_b, task_c]))
+  #print(ms.calc_makespan(jobs4, 32, 16, [task_a, task_b, task_c]))
+  #print(ms.calc_makespan(out4, 32, 16, [task_a, task_b, task_c]))
