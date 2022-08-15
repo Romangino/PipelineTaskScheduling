@@ -1,0 +1,12 @@
+Chakraborty, Shouvik & Bhowmik, Sandeep. (2013). Job Shop Scheduling using Simulated Annealing. 
+(https://www.researchgate.net/publication/316988567_Job_Shop_Scheduling_using_Simulated_Annealing)
+
+
+"A Simulated Annealing Algorithm for Scheduling Problems"
+written by Crescenzio Gallo, Vito Capozzi,
+published by Journal of Applied Mathematics and Physics, Vol.7 No.11, 2019
+(https://www.scirp.org/journal/paperinformation.aspx?paperid=96189#f4)
+
+
+"Optimization Techniques — Simulated Annealing" - Frank Liang. Apr 20, 2020.
+(https://towardsdatascience.com/optimization-techniques-simulated-annealing-d6a4785a1de7)
